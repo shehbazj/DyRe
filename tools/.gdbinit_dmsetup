@@ -1,0 +1,2 @@
+b main
+r create mydev --table '0 10 linear /dev/loop1 0'
