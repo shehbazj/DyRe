@@ -8,6 +8,10 @@ fi
 numDrives=$1
 deviceArray=$2
 
+echo "Delete volume if it exsits"
+
+lvremove root
+
 echo "Delete Volume Group if it exists"
 
 vgremove vol_vg
