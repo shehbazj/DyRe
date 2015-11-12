@@ -36,6 +36,10 @@ ifeq ("@RAID@", "shared")
   SUBDIRS += raid
 endif
 
+ifeq ("@DYRE@", "shared")
+  SUBDIRS += dyre
+endif
+
 ifeq ("@REPLICATORS@", "shared")
   SUBDIRS += replicator
 endif
@@ -162,6 +166,10 @@ ifeq ("@RAID@", "internal")
   SOURCES += raid/raid.c
 endif
 
+ifeq ("@DYRE@", "internal")
+  SOURCES += dyre/dyre.c
+endif
+
 ifeq ("@REPLICATORS@", "internal")
   SOURCES += replicator/replicator.c
 endif
@@ -216,6 +224,7 @@ ifeq ($(MAKECMDGOALS),distclean)
 	snapshot \
 	mirror \
 	raid \
+	dyre \
 	replicator \
 	thin \
 	cache_segtype \

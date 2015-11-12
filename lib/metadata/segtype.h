@@ -93,6 +93,9 @@ struct dev_manager;
 #define SEG_TYPE_NAME_RAID6_NC		"raid6_nc"
 #define SEG_TYPE_NAME_RAID6_NR		"raid6_nr"
 #define SEG_TYPE_NAME_RAID6_ZR		"raid6_zr"
+#define SEG_TYPE_NAME_DYRE1		"dyre1"
+#define SEG_TYPE_NAME_DYRE2		"dyre2"
+#define SEG_TYPE_NAME_DYRE3		"dyre3"
 
 #define segtype_is_linear(segtype)	(!strcmp(segtype->name, SEG_TYPE_NAME_LINEAR))
 #define segtype_is_cache(segtype)	((segtype)->flags & SEG_CACHE ? 1 : 0)
@@ -116,6 +119,10 @@ struct dev_manager;
 #define segtype_is_raid6_nr(segtype)	((segtype)->flags & SEG_RAID6_NR ? 1 : 0)
 #define segtype_is_raid6_zr(segtype)	((segtype)->flags & SEG_RAID6_ZR ? 1 : 0)
 #define segtype_is_raid10(segtype)	((segtype)->flags & SEG_RAID10 ? 1 : 0)
+#define segtype_is_dyre(segtype)	((segtype)->flags & (SEG_DYRE0 | SEG_DYRE1 | SEG_DYRE2)) 1: 0)
+#define segtype_is_dyre0(segtype)	((segtype)->flags & SEG_DYRE0 ? 1 : 0)
+#define segtype_is_dyre1(segtype)	((segtype)->flags & SEG_DYRE1 ? 1 : 0)
+#define segtype_is_dyre2(segtype)	((segtype)->flags & SEG_DYRE2 ? 1 : 0)
 #define segtype_is_snapshot(segtype)	((segtype)->flags & SEG_SNAPSHOT ? 1 : 0)
 #define segtype_is_striped(segtype)	((segtype)->flags & SEG_AREAS_STRIPED ? 1 : 0)
 #define segtype_is_thin(segtype)	((segtype)->flags & (SEG_THIN_POOL|SEG_THIN_VOLUME) ? 1 : 0)
@@ -234,6 +241,8 @@ struct segment_type *init_unknown_segtype(struct cmd_context *cmd,
 #ifdef RAID_INTERNAL
 int init_raid_segtypes(struct cmd_context *cmd, struct segtype_library *seglib);
 #endif
+
+int init_dyre_segtypes(struct cmd_context *cmd, struct segtype_library *seglib);
 
 #ifdef REPLICATOR_INTERNAL
 int init_replicator_segtype(struct cmd_context *cmd, struct segtype_library *seglib);

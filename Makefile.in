@@ -189,7 +189,7 @@ $(LCOV_TRACES):
 	$(LCOV) -b $(basename $@) -d $(basename $@) \
 		--ignore-errors source -c -o - | $(SED) \
 		-e "s/\(dmeventd_lvm.[ch]\)/plugins\/lvm2\/\1/" \
-		-e "s/dmeventd_\(mirror\|snapshot\|thin\|raid\)\.c/plugins\/\1\/dmeventd_\1\.c/" \
+		-e "s/dmeventd_\(mirror\|snapshot\|thin\|raid\|dyre\)\.c/plugins\/\1\/dmeventd_\1\.c/" \
 		>$@
 
 ifneq ("$(GENHTML)", "")
