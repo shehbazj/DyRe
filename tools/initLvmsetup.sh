@@ -1,5 +1,5 @@
 if [ `id -g` != 0 ]; then
-	echo "Run the script as sudo user"
+	echo "Usage SUDO: ./initLvmsetup [numDrives]"
 	exit
 fi
 

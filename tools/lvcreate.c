@@ -391,6 +391,8 @@ static int _read_size_params(struct cmd_context *cmd,
 				      mirrors_ARG,
 				      maxrecoveryrate_ARG,
 				      minrecoveryrate_ARG,
+				      minredundancy_ARG,
+				      maxredundancy_ARG,
 				      regionsize_ARG,
 				      size_ARG,
 				      stripes_ARG, stripesize_ARG,
@@ -747,6 +749,12 @@ static int _lvcreate_params(struct cmd_context *cmd,
 	minrecoveryrate_ARG,\
 	raidmaxrecoveryrate_ARG,\
 	raidminrecoveryrate_ARG
+
+#define DYRE_ARGS \
+	minredundancy_ARG,\
+	maxredundancy_ARG,\
+	dyreminredundancy_ARG,\
+	dyremaxredundancy_ARG	
 
 #define SIZE_ARGS \
 	extents_ARG,\

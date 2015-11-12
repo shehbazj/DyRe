@@ -170,6 +170,8 @@ xx(lvchange,
    "\t[--[raid]syncaction {check|repair}\n"
    "\t[--[raid]writebehind <IOCount>]\n"
    "\t[--[raid]writemostly <PhysicalVolume>[:{t|n|y}]]\n"
+   "\t[--[dyre]minredundancy <min>]\n"
+   "\t[--[dyre]maxredundancy <max>]\n"
    "\t[-r|--readahead <ReadAheadSectors>|auto|none]\n"
    "\t[--refresh]\n"
    "\t[--resync]\n"
@@ -187,10 +189,10 @@ xx(lvchange,
    discards_ARG, detachprofile_ARG, errorwhenfull_ARG, force_ARG,
    ignorelockingfailure_ARG, ignoremonitoring_ARG, ignoreactivationskip_ARG,
    ignoreskippedcluster_ARG, major_ARG, metadataprofile_ARG, minor_ARG,
-   monitor_ARG, minrecoveryrate_ARG, maxrecoveryrate_ARG, noudevsync_ARG,
+   monitor_ARG, minrecoveryrate_ARG, maxrecoveryrate_ARG, minredundancy_ARG, maxredundancy_ARG, noudevsync_ARG,
    partial_ARG, permission_ARG, persistent_ARG, poll_ARG,
    raidminrecoveryrate_ARG, raidmaxrecoveryrate_ARG, raidsyncaction_ARG,
-   raidwritebehind_ARG, raidwritemostly_ARG, readahead_ARG, resync_ARG,
+   raidwritebehind_ARG, raidwritemostly_ARG, dyreminredundancy_ARG, dyremaxredundancy_ARG , readahead_ARG, resync_ARG,
    refresh_ARG, select_ARG, setactivationskip_ARG, syncaction_ARG, sysinit_ARG,
    test_ARG, writebehind_ARG, writemostly_ARG, zero_ARG)
 
@@ -332,6 +334,8 @@ xx(lvcreate,
    "\t[--poolmetadataspare {y|n}]]\n"
    "\t[--[raid]minrecoveryrate Rate]\n"
    "\t[--[raid]maxrecoveryrate Rate]\n"
+   "\t[--[dyre]minredundancy Min]\n"
+   "\t[--[dyre]maxredundancy Max]\n"
    "\t[-r|--readahead {ReadAheadSectors|auto|none}]\n"
    "\t[-R|--regionsize MirrorLogRegionSize]\n"
    "\t[-T|--thin\n"
@@ -388,11 +392,12 @@ xx(lvcreate,
    chunksize_ARG, contiguous_ARG, corelog_ARG, discards_ARG, errorwhenfull_ARG,
    extents_ARG, ignoreactivationskip_ARG, ignoremonitoring_ARG, major_ARG,
    metadataprofile_ARG, minor_ARG, mirrorlog_ARG, mirrors_ARG, monitor_ARG,
-   minrecoveryrate_ARG, maxrecoveryrate_ARG, name_ARG, nosync_ARG,
+   minrecoveryrate_ARG, maxrecoveryrate_ARG, minredundancy_ARG, maxredundancy_ARG , name_ARG, nosync_ARG,
    noudevsync_ARG, permission_ARG, persistent_ARG,
    //pooldatasize_ARG,
    poolmetadatasize_ARG, poolmetadataspare_ARG,
    raidminrecoveryrate_ARG, raidmaxrecoveryrate_ARG,
+   dyreminredundancy_ARG, dyremaxredundancy_ARG,
    readahead_ARG, regionsize_ARG, setactivationskip_ARG, size_ARG, snapshot_ARG,
    stripes_ARG, stripesize_ARG, test_ARG, thin_ARG, thinpool_ARG, type_ARG,
    virtualoriginsize_ARG, virtualsize_ARG, wipesignatures_ARG, zero_ARG)

@@ -131,6 +131,7 @@ struct dev_manager;
 #define seg_is_mirrored(seg)	segtype_is_mirrored((seg)->segtype)
 #define seg_is_pool(seg)	segtype_is_pool((seg)->segtype)
 #define seg_is_raid(seg)	segtype_is_raid((seg)->segtype)
+#define seg_is_dyre(seg)	segtype_is_dyre((seg)->segtype)
 #define seg_is_raid1(seg)	segtype_is_raid1((seg)->segtype)
 #define seg_is_raid4(seg)	segtype_is_raid4((seg)->segtype)
 #define seg_is_any_raid5(seg)	segtype_is_any_raid5((seg)->segtype)
