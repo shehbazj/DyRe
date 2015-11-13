@@ -52,6 +52,9 @@ enum {
 	SEG_RAID6_ZR,
 	SEG_RAID6_NR,
 	SEG_RAID6_NC,
+	SEG_DYRE1,
+	SEG_DYRE2,
+	SEG_DYRE3,
 };
 
 /* FIXME Add crypt and multipath support */

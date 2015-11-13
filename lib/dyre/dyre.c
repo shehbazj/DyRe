@@ -392,7 +392,13 @@ static int _raid_target_unmonitor_events(struct lv_segment *seg, int events)
 #  endif // DMEVENTD /
 #endif // DEVMAPPER_SUPPORT /
 */
+
+static void dummy(void){
+	return;
+}
+
 static struct segtype_handler _dyre_ops = {
+/*
 	.display = _dyre_display,
 	.text_import_area_count = _dyre_text_import_area_count,
 	.text_import = _dyre_text_import,
@@ -410,6 +416,25 @@ static struct segtype_handler _dyre_ops = {
 #  endif        // DMEVENTD /
 #endif
 	.destroy = _dyre_destroy,
+*/
+	.display = dummy,
+	.text_import_area_count = dummy,
+	.text_import = dummy,
+	.text_export = dummy,
+	.add_target_line = dummy,
+	.target_status_compatible = dummy,
+#ifdef DEVMAPPER_SUPPORT
+	.target_percent = dummy,
+	.target_present = dummy,
+	.modules_needed = dummy,
+#  ifdef DMEVENTD
+	.target_monitored = dummy,
+	.target_monitor_events = dummy,
+	.target_unmonitor_events = dummy,
+#  endif        // DMEVENTD /
+#endif
+	.destroy = dummy,
+
 };
 
 static const struct dyre_type {
@@ -417,9 +442,9 @@ static const struct dyre_type {
 	unsigned parity;
 	uint64_t extra_flags;
 } _dyre_types[] = {
-	{ SEG_TYPE_NAME_DYRE0,    0, SEG_DYRE0 },
 	{ SEG_TYPE_NAME_DYRE1,    0, SEG_DYRE1 },
-	{ SEG_TYPE_NAME_DYRE2,    0, SEG_DYRE2 }
+	{ SEG_TYPE_NAME_DYRE2,    0, SEG_DYRE2 },
+	{ SEG_TYPE_NAME_DYRE3,    0, SEG_DYRE3 }
 };
 
 static struct segment_type *_init_dyre_segtype(struct cmd_context *cmd,
@@ -430,13 +455,13 @@ static struct segment_type *_init_dyre_segtype(struct cmd_context *cmd,
 
 	if (!segtype) {
 		log_error("Failed to allocate memory for %s segtype",
-			  rt->name);
+			  dt->name);
 		return NULL;
 	}
 
 	segtype->ops = &_dyre_ops;
 	segtype->name = dt->name;
-	segtype->flags = SEG_DYRE | dt->extra_flags | monitored;
+	segtype->flags = SEG_DYRE | SEG_ONLY_EXCLUSIVE |dt->extra_flags | monitored;
 	segtype->parity_devs = dt->parity;
 
 	log_very_verbose("Initialised segtype: %s", segtype->name);
@@ -444,10 +469,13 @@ static struct segment_type *_init_dyre_segtype(struct cmd_context *cmd,
 	return segtype;
 }
 
+#ifdef DYRE_INTERNAL
 int init_dyre_segtypes(struct cmd_context *cmd, struct segtype_library *seglib)
-//int init_multiple_segtypes(struct cmd_context *cmd, struct segtype_library *seglib);
+#else
+int init_multiple_segtypes(struct cmd_context *cmd, struct segtype_library *seglib);
 
-//int init_multiple_segtypes(struct cmd_context *cmd, struct segtype_library *seglib)
+int init_multiple_segtypes(struct cmd_context *cmd, struct segtype_library *seglib)
+#endif
 {
 	struct segment_type *segtype;
 	unsigned i;
@@ -461,7 +489,7 @@ int init_dyre_segtypes(struct cmd_context *cmd, struct segtype_library *seglib)
 #endif
 
 	for (i = 0; i < DM_ARRAY_SIZE(_dyre_types); ++i)
-		if ((segtype = _init_raid_segtype(cmd, &_raid_types[i], monitored)) &&
+		if ((segtype = _init_dyre_segtype(cmd, &_dyre_types[i], monitored)) &&
 		    !lvm_register_segtype(seglib, segtype))
 			/* segtype is already destroyed */
 			return_0;
