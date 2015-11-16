@@ -36,9 +36,9 @@ ifeq ("@RAID@", "shared")
   SUBDIRS += raid
 endif
 
-ifeq ("@DYRE@", "shared")
+#ifeq ("@DYRE@", "shared")
   SUBDIRS += dyre
-endif
+#endif
 
 ifeq ("@REPLICATORS@", "shared")
   SUBDIRS += replicator
@@ -166,9 +166,9 @@ ifeq ("@RAID@", "internal")
   SOURCES += raid/raid.c
 endif
 
-ifeq ("@DYRE@", "internal")
+#ifeq ("@DYRE@", "internal")
   SOURCES += dyre/dyre.c
-endif
+#endif
 
 ifeq ("@REPLICATORS@", "internal")
   SOURCES += replicator/replicator.c

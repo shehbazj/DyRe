@@ -94,6 +94,9 @@ static const struct {
 	 */
 	{ SEG_RAID5_LS, "raid5"}, /* same as "raid5_ls" (default for MD also) */
 	{ SEG_RAID6_ZR, "raid6"}, /* same as "raid6_zr" */
+	{ SEG_DYRE1, "dyre1"},
+	{ SEG_DYRE2, "dyre2"},
+	{ SEG_DYRE3, "dyre3"},
 };
 
 /* Some segment types have a list of areas of other devices attached */

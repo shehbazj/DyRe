@@ -394,6 +394,10 @@ case "$RAID" in
   *) AC_MSG_ERROR([--with-raid parameter invalid]) ;;
 esac
 
+AC_DEFINE([DYRE_INTERNAL], 1,
+		[Define to 1 to include built-in support for dyre.]) ;;
+  *) AC_MSG_ERROR([--with-dyre parameter invalid]) ;;
+
 AC_DEFINE_UNQUOTED([DEFAULT_MIRROR_SEGTYPE], ["$DEFAULT_MIRROR_SEGTYPE"],
 		   [Default segtype used for mirror volumes.])
 
@@ -2088,6 +2092,7 @@ lib/mirror/Makefile
 lib/replicator/Makefile
 include/lvm-version.h
 lib/raid/Makefile
+lib/dyre/Makefile
 lib/snapshot/Makefile
 lib/thin/Makefile
 lib/cache_segtype/Makefile

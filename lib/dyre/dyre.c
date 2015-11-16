@@ -483,8 +483,10 @@ int init_multiple_segtypes(struct cmd_context *cmd, struct segtype_library *segl
 
 #ifdef DEVMAPPER_SUPPORT
 #  ifdef DMEVENTD
-	if (_get_dyre_dso_path(cmd))
-		monitored = SEG_MONITORED;
+	printf("trace raid.c code\n");
+	assert(0);
+//	if (_get_dyre_dso_path(cmd))
+//		monitored = SEG_MONITORED;
 #  endif
 #endif
 

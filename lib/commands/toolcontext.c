@@ -1488,6 +1488,11 @@ static int _init_segtypes(struct cmd_context *cmd)
 		return 0;
 #endif
 
+#ifdef DYRE_INTERNAL
+	if (!init_dyre_segtypes(cmd, &seglib))
+		return 0;
+#endif
+
 #ifdef THIN_INTERNAL
 	if (!init_thin_segtypes(cmd, &seglib))
 		return 0;

@@ -878,6 +878,19 @@ static int _lvcreate_params(struct cmd_context *cmd,
 					-1))
 		return_0;
 
+	if(seg_is_dyre(lp)) {
+		if (arg_outside_list_is_set(cmd, "is unsupported with dyre",
+					    LVCREATE_ARGS,
+					    DYRE_ARGS,
+					    SIZE_ARGS,
+					    wipesignatures_ARG, zero_ARG,
+					    -1))
+			return_0;
+	} else if (arg_from_list_is_set(cmd, "is supported only with dyre",
+					DYRE_ARGS,
+					-1))
+		return_0;
+	
 	/* Thin and thin-pool segment type */
 	if (seg_is_thin_volume(lp)) {
 		/* Only supported with --type thin, -T, --thin, -V */
