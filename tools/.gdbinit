@@ -5,6 +5,8 @@ b lvcreate
 #b lvm_run_command
 #b lvm2_main
 #b _lvcreate_params
+b _should_wipe_lv
+b _lv_create_an_lv
 #b _process_command_line
 #b segtype_arg
 #b init_dyre_segtypes

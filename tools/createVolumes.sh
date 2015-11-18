@@ -24,7 +24,10 @@ echo "Device Array $deviceArray"
 
 pvcreate /dev/loop$deviceArray
 
-echo "creating virtual groups"
+echo "Display physical volumes"
+pvdisplay
+
+echo "creating virtual volume groups"
 
 vgcreate vol_vg /dev/loop$deviceArray
 
