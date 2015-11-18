@@ -14,7 +14,7 @@
  */
 
 #include "tools.h"
-
+#include <assert.h>
 #include <fcntl.h>
 
 struct lvcreate_cmdline_params {
@@ -1218,6 +1218,50 @@ static int _determine_snapshot_type(struct volume_group *vg,
 	return 1;
 }
 
+static int _check_dyre_parameters(struct volume_group *vg,
+				  struct lvcreate_params *lp,
+				  struct lvcreate_cmdline_params *lcp)
+{
+	unsigned devs = lcp->pv_count ? : dm_list_size(&vg->pvs);
+	struct cmd_context *cmd = vg->cmd;
+
+	/*
+	 * If number of devices was not supplied, we can infer from
+	 * the PVs given.
+	 */
+	/*
+	if (!seg_is_mirrored(lp)) {
+		if (!arg_count(cmd, stripes_ARG) &&
+		    (devs > 2 * lp->segtype->parity_devs))
+			lp->stripes = devs - lp->segtype->parity_devs;
+
+		if (!lp->stripe_size)
+			lp->stripe_size = find_config_tree_int(cmd, metadata_stripesize_CFG, NULL) * 2;
+
+		if (lp->stripes <= lp->segtype->parity_devs) {
+			log_error("Number of stripes must be at least %d for %s",
+				  lp->segtype->parity_devs + 1,
+				  lp->segtype->name);
+			return 0;
+		}
+	} else if (segtype_is_raid10(lp->segtype)) {
+		if (!arg_count(cmd, stripes_ARG))
+			lp->stripes = devs / lp->mirrors;
+		if (lp->stripes < 2) {
+			log_error("Unable to create RAID10 LV,"
+				  " insufficient number of devices.");
+			return 0;
+		}
+	}
+
+	*/
+	/* 'mirrors' defaults to 2 - not the number of PVs supplied */
+	assert(lp->stripes != 0);
+	assert(lp->stripe_size != 0);
+
+	return 1;
+}
+
 static int _check_raid_parameters(struct volume_group *vg,
 				  struct lvcreate_params *lp,
 				  struct lvcreate_cmdline_params *lcp)
@@ -1509,6 +1553,9 @@ int lvcreate(struct cmd_context *cmd, int argc, char **argv)
 
 	/* All types resolved at this point, now only validation steps */
 	if (seg_is_raid(&lp) && !_check_raid_parameters(vg, &lp, &lcp))
+		goto_out;
+
+	if (seg_is_dyre(&lp) && !_check_dyre_parameters(vg, &lp, &lcp))
 		goto_out;
 
 	if (seg_is_thin(&lp) && !_check_thin_parameters(vg, &lp, &lcp))

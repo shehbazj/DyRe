@@ -12,5 +12,5 @@ b lvcreate
 #b init_multiple_segtypes
 #r --extents 100%FREE --stripes 3 --stripesize 256 --name root vol_vg
 #r --type raid4 -i 3 -L 30M -n root vol_vg
-r --type dyre1 --minredundancy 1 --maxredundancy 3 -L 30M -n root vol_vg
+r --type dyre1 --minredundancy 1 --maxredundancy 3 --stripes 3 --stripesize 256 -L 30M -n root vol_vg
 #r --extents 100%FREE -name root vol_vg
