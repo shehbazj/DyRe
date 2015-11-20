@@ -23,7 +23,7 @@ echo $numDevs
 
 # start gdb
 
-gdb lvcreate 
+#gdb lvcreate 
 
 
 #echo $numDevs
