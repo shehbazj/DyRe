@@ -622,6 +622,7 @@ int target_present(struct cmd_context *cmd, const char *target_name,
 
 #ifdef MODPROBE_CMD
 	if (use_modprobe) {
+		printf("%s Modprobe preesnt\n",__func__);
 		if (target_version(target_name, &maj, &min, &patchlevel))
 			return 1;
 
@@ -629,7 +630,6 @@ int target_present(struct cmd_context *cmd, const char *target_name,
 			return_0;
 	}
 #endif
-
 	return target_version(target_name, &maj, &min, &patchlevel);
 }
 

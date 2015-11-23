@@ -35,6 +35,8 @@ echo "Display Virtual Groups"
 
 vgdisplay
 
+sudo lvremove vol_vg root
+
 #echo "Create A logical Volume"
 
 #lvcreate --extents 100%FREE --name root vol_vg

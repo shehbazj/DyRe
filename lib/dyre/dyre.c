@@ -24,23 +24,23 @@
 #include "metadata.h"
 #include "lv_alloc.h"
 /*
-static void _d_display(const struct lv_segment *seg)
+static void _dyre_display(const struct lv_segment *seg)
 {
-asdasd
 	unsigned s;
 
 	for (s = 0; s < seg->area_count; ++s) {
-		log_print("  Raid Data LV%2d", s);
+		log_print("  Dyre Data LV%2d", s);
 		display_stripe(seg, s, "    ");
 	}
 
 	for (s = 0; s < seg->area_count; ++s)
-		log_print("  Raid Metadata LV%2d\t%s", s, seg_metalv(seg, s)->name);
+		log_print("  Dyre Metadata LV%2d\t%s", s, seg_metalv(seg, s)->name);
 
 	log_print(" ");
 }
 
-static int _raid_text_import_area_count(const struct dm_config_node *sn,
+*/
+static int _dyre_text_import_area_count(const struct dm_config_node *sn,
 					uint32_t *area_count)
 {
 	if (!dm_config_get_uint32(sn, "device_count", area_count)) {
@@ -50,7 +50,7 @@ static int _raid_text_import_area_count(const struct dm_config_node *sn,
 	}
 	return 1;
 }
-
+/*
 static int _raid_text_import_areas(struct lv_segment *seg,
 				   const struct dm_config_node *sn,
 				   const struct dm_config_value *cv)
@@ -250,12 +250,12 @@ static int _raid_target_status_compatible(const char *type)
 {
 	return (strstr(type, "raid") != NULL);
 }
-
-static void _raid_destroy(struct segment_type *segtype)
+*/
+static void _dyre_destroy(struct segment_type *segtype)
 {
 	dm_free((void *) segtype);
 }
-
+/*
 #ifdef DEVMAPPER_SUPPORT
 static int _raid_target_percent(void **target_state,
 				dm_percent_t *percent,
@@ -298,8 +298,8 @@ static int _raid_target_percent(void **target_state,
 
 	return 1;
 }
-
-static int _raid_target_present(struct cmd_context *cmd,
+*/
+static int _dyre_target_present(struct cmd_context *cmd,
 				const struct lv_segment *seg __attribute__((unused)),
 				unsigned *attributes)
 {
@@ -307,23 +307,23 @@ static int _raid_target_present(struct cmd_context *cmd,
 	static const struct feature {
 		uint32_t maj;
 		uint32_t min;
-		unsigned raid_feature;
+		unsigned dyre_feature;
 		const char *feature;
 	} _features[] = {
 		{ 1, 3, RAID_FEATURE_RAID10, SEG_TYPE_NAME_RAID10 },
 		{ 1, 7, RAID_FEATURE_RAID0, SEG_TYPE_NAME_RAID0 },
 	};
 
-	static int _raid_checked = 0;
-	static int _raid_present = 0;
-	static int _raid_attrs = 0;
+	static int _dyre_checked = 0;
+	static int _dyre_present = 0;
+	static int _dyre_attrs = 0;
 	uint32_t maj, min, patchlevel;
 	unsigned i;
 
-	if (!_raid_checked) {
-		_raid_present = target_present(cmd, "raid", 1);
+	if (!_dyre_checked) {
+		_dyre_present = target_present(cmd, "dyre", 1);
 
-		if (!target_version("raid", &maj, &min, &patchlevel)) {
+		if (!target_version("dyre", &maj, &min, &patchlevel)) {
 			log_error("Cannot read target version of RAID kernel module.");
 			return 0;
 		}
@@ -331,20 +331,20 @@ static int _raid_target_present(struct cmd_context *cmd,
 		for (i = 0; i < DM_ARRAY_SIZE(_features); ++i)
 			if ((maj > _features[i].maj) ||
 			    (maj == _features[i].maj && min >= _features[i].min))
-				_raid_attrs |= _features[i].raid_feature;
+				_dyre_attrs |= _features[i].dyre_feature;
 			else
-				log_very_verbose("Target raid does not support %s.",
+				log_very_verbose("Target dyre does not support %s.",
 						 _features[i].feature);
 
-		_raid_checked = 1;
+		_dyre_checked = 1;
 	}
 
 	if (attributes)
-		*attributes = _raid_attrs;
+		*attributes = _dyre_attrs;
 
-	return _raid_present;
+	return _dyre_present;
 }
-
+/*
 static int _raid_modules_needed(struct dm_pool *mem,
 				const struct lv_segment *seg __attribute__((unused)),
 				struct dm_list *modules)
@@ -399,7 +399,6 @@ static void dummy(void){
 
 static struct segtype_handler _dyre_ops = {
 /*
-	.display = _dyre_display,
 	.text_import_area_count = _dyre_text_import_area_count,
 	.text_import = _dyre_text_import,
 	.text_export = _dyre_text_export,
@@ -425,7 +424,7 @@ static struct segtype_handler _dyre_ops = {
 	.target_status_compatible = dummy,
 #ifdef DEVMAPPER_SUPPORT
 	.target_percent = dummy,
-	.target_present = dummy,
+	.target_present = _dyre_target_present,
 	.modules_needed = dummy,
 #  ifdef DMEVENTD
 	.target_monitored = dummy,
@@ -433,7 +432,7 @@ static struct segtype_handler _dyre_ops = {
 	.target_unmonitor_events = dummy,
 #  endif        // DMEVENTD /
 #endif
-	.destroy = dummy,
+	.destroy = _dyre_destroy,
 
 };
 
