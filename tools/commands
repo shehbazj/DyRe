@@ -1,0 +1,1 @@
+sudo dmsetup create --table= tablefile --target striped stripe_dev

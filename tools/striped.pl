@@ -27,5 +27,4 @@ for ($i = 0; $i < $num_devs; $i++) {
         $table .= " $devs[$i] 0";
 }
 
-
 print "$table | dmsetup create $dev_name";
