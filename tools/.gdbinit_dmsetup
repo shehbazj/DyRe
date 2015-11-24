@@ -1,0 +1,3 @@
+b main
+b _perform_command_for_all_repeatable_args
+r create --table=tablefile mydev
