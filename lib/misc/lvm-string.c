@@ -177,7 +177,7 @@ static const char *_lvname_has_reserved_string(const char *lvname)
 int apply_lvname_restrictions(const char *name)
 {
 	const char *s;
-
+/*
 	if ((s = _lvname_has_reserved_prefix(name))) {
 		log_error("Names starting \"%s\" are reserved. "
 			  "Please choose a different LV name.", s);
@@ -189,7 +189,7 @@ int apply_lvname_restrictions(const char *name)
 			  "Please choose a different LV name.", s);
 		return 0;
 	}
-
+*/
 	return 1;
 }
 

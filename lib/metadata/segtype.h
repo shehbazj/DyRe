@@ -51,6 +51,7 @@ struct dev_manager;
 #define SEG_RAID1		0x0000000000100000ULL
 #define SEG_RAID10		0x0000000000200000ULL
 #define SEG_RAID4		0x0000000000400000ULL
+#define SEG_RAID2P		0x0000000000600000ULL
 #define SEG_RAID5_N		0x0000000000800000ULL
 #define SEG_RAID5_LA		0x0000000001000000ULL
 #define SEG_RAID5_LS		0x0000000002000000ULL
@@ -98,6 +99,7 @@ struct dev_manager;
 #define SEG_TYPE_NAME_RAID6_NC		"raid6_nc"
 #define SEG_TYPE_NAME_RAID6_NR		"raid6_nr"
 #define SEG_TYPE_NAME_RAID6_ZR		"raid6_zr"
+#define SEG_TYPE_NAME_RAID2P		"raid2p"
 #define SEG_TYPE_NAME_DYRE		"dyre"
 #define SEG_TYPE_NAME_DYRE1		"dyre1"
 #define SEG_TYPE_NAME_DYRE2		"dyre2"
@@ -112,6 +114,7 @@ struct dev_manager;
 #define segtype_is_raid(segtype)	((segtype)->flags & SEG_RAID ? 1 : 0)
 #define segtype_is_raid1(segtype)	((segtype)->flags & SEG_RAID1 ? 1 : 0)
 #define segtype_is_raid4(segtype)	((segtype)->flags & SEG_RAID4 ? 1 : 0)
+#define segtype_is_raid2p(segtype)	((segtype)->flags & SEG_RAID2P ? 1 : 0)
 #define segtype_is_any_raid5(segtype)	((segtype)->flags & \
 					 (SEG_RAID5_LS|SEG_RAID5_LA|SEG_RAID5_RS|SEG_RAID5_RA|SEG_RAID5_N) ? 1 : 0)
 #define segtype_is_raid5_la(segtype)	((segtype)->flags & SEG_RAID5_LA ? 1 : 0)
@@ -147,6 +150,7 @@ struct dev_manager;
 #define seg_is_dyre(seg)	segtype_is_dyre((seg)->segtype)
 #define seg_is_raid1(seg)	segtype_is_raid1((seg)->segtype)
 #define seg_is_raid4(seg)	segtype_is_raid4((seg)->segtype)
+#define seg_is_raid2p(seg)	segtype_is_raid2p((seg)->segtype)
 #define seg_is_any_raid5(seg)	segtype_is_any_raid5((seg)->segtype)
 #define seg_is_raid5_la(seg)	segtype_is_raid5_la((seg)->segtype)
 #define seg_is_raid5_ra(seg)	segtype_is_raid5_ra((seg)->segtype)

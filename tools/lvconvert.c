@@ -451,6 +451,13 @@ static int _read_params(struct cmd_context *cmd, int argc, char **argv,
 		return 0;
 	}
 
+	if (arg_count(cmd, udgrade_ARG)){
+	//	lp->seg_name = arg_str_value(cmd, name_ARG, NULL);
+		if (!(lp->segtype = get_segtype_from_string(cmd, arg_str_value(cmd, udgrade_ARG, NULL) ))){
+			printf("ERROR getting segtype for lvconvert from given parameters\n");
+		}
+	}
+
 	if (arg_count(cmd, cache_ARG))
 		lp->cache = 1;
 
@@ -1715,7 +1722,7 @@ static int _lvconvert_raid(struct logical_volume *lv, struct lvconvert_params *l
 	struct lv_segment *seg = first_seg(lv);
 	dm_percent_t sync_percent;
 
-	if (!arg_count(cmd, type_ARG))
+	if (!arg_count(cmd, type_ARG) && !arg_is_set(cmd, udgrade_ARG))
 		lp->segtype = seg->segtype;
 
 	/* Can only change image count for raid1 and linear */
@@ -1754,6 +1761,12 @@ static int _lvconvert_raid(struct logical_volume *lv, struct lvconvert_params *l
 		}
 	}
 
+	/*Change number of RAID4 images for upgrade to raid2p */
+	if(segtype_is_raid4(first_seg(lv)->segtype) && segtype_is_raid2p(lp->segtype)) {
+		image_count = lv_raid_image_count(lv);
+		image_count += 1;
+	}
+
 	if (lp->merge_mirror)
 		return lv_raid_merge(lv);
 
@@ -1766,6 +1779,12 @@ static int _lvconvert_raid(struct logical_volume *lv, struct lvconvert_params *l
 
 	if (arg_count(cmd, mirrors_ARG))
 		return lv_raid_change_image_count(lv, image_count, lp->pvh);
+
+	if (arg_count(cmd, udgrade_ARG)) // allocate only image and meta for 
+					// data part of the disk. I think the 
+					// parity is being computed in the Kernel.
+		return lv_raid_udgrade_image_count(lv, image_count, lp->pvh,\
+				 arg_str_value(cmd, udgrade_ARG, NULL));
 
 	if (arg_count(cmd, type_ARG))
 		return lv_raid_reshape(lv, lp->segtype);
@@ -3291,9 +3310,11 @@ static int _lvconvert_single(struct cmd_context *cmd, struct logical_volume *lv,
 	}
 
 	if (!lp->segtype) {
+//		printf("XXX SHould not reach here\n");
+		
 		/* segtype not explicitly set in _read_params */
 		lp->segtype = first_seg(lv)->segtype;
-
+		
 		/*
 		 * If we are converting to mirror/raid1 and
 		 * the segtype was not specified, then we need

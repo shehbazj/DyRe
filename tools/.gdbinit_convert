@@ -1,0 +1,6 @@
+#b main
+#b  _lvconvert_raid
+#b _lvconvert_raid 
+r -x raid2p vol_vg/raid4
+#r --type raid4 -m 1 vol_vg/linearvol
+#r -m +1 vol_vg/linearvol

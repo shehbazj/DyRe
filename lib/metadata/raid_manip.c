@@ -424,7 +424,8 @@ static struct logical_volume *_alloc_image_component(struct logical_volume *lv,
 static int _alloc_image_components(struct logical_volume *lv,
 				   struct dm_list *pvs, uint32_t count,
 				   struct dm_list *new_meta_lvs,
-				   struct dm_list *new_data_lvs)
+				   struct dm_list *new_data_lvs,
+				const char *new_segtype)
 {
 	uint32_t s;
 	uint32_t region_size;
@@ -444,10 +445,15 @@ static int _alloc_image_components(struct logical_volume *lv,
 
 	if (seg_is_linear(seg))
 		region_size = get_default_region_size(lv->vg->cmd);
-	else
+	else 
 		region_size = seg->region_size;
 
-	if (seg_is_raid(seg))
+	if(!strcmp(new_segtype,"raid2p")){	// this is required because of default
+						// initialization of segtype to raid4 
+		if(!(segtype = get_segtype_from_string(lv->vg->cmd, new_segtype))){
+			return_0;
+		}
+	}else if (seg_is_raid(seg))
 		segtype = seg->segtype;
 	else if (!(segtype = get_segtype_from_string(lv->vg->cmd, SEG_TYPE_NAME_RAID1)))
 		return_0;
@@ -462,10 +468,19 @@ static int _alloc_image_components(struct logical_volume *lv,
 	 */
 	if (segtype_is_raid10(segtype))
 		extents = lv->le_count / (seg->area_count / 2); /* we enforce 2 mirrors right now */
-	else
+	else if (segtype_is_raid2p(segtype)){
+		extents = 0;
+		/* TODO: RAID2P parity needs to be allocated extents here.
+		allocate_image_component(meta)
+		allocate_image_component(image)
+		add them to new_meta_lvs, and new_data_lvs respectively. 
+		*/  
+	}
+	else{
 		extents = (segtype->parity_devs) ?
 			   (lv->le_count / (seg->area_count - segtype->parity_devs)) :
 			   lv->le_count;
+	}
 
 	if (!(ah = allocate_extents(lv->vg, NULL, segtype, 0, count, count,
 				    region_size, extents, pvs,
@@ -551,7 +566,7 @@ static int _alloc_rmeta_for_lv(struct logical_volume *data_lv,
 }
 
 static int _raid_add_images(struct logical_volume *lv,
-			    uint32_t new_count, struct dm_list *pvs)
+			    uint32_t new_count, struct dm_list *pvs, const char *new_segtype )
 {
 	int rebuild_flag_cleared = 0;
 	uint32_t s;
@@ -604,7 +619,8 @@ static int _raid_add_images(struct logical_volume *lv,
 		return 0;
 	}
 
-	if (!_alloc_image_components(lv, pvs, count, &meta_lvs, &data_lvs))
+	// add a new meta + data volume here.
+	if (!_alloc_image_components(lv, pvs, count, &meta_lvs, &data_lvs, new_segtype))
 		return_0;
 
 	/*
@@ -1038,6 +1054,11 @@ static int _raid_remove_images(struct logical_volume *lv,
 	return 1;
 }
 
+int lv_raid_udgrade_image_count(struct logical_volume *lv, 
+				uint32_t new_count, struct dm_list *pvs, const char *new_segtype){
+	return _raid_add_images(lv, new_count, pvs, new_segtype);
+}
+
 /*
  * lv_raid_change_image_count
  * @lv
@@ -1076,7 +1097,7 @@ int lv_raid_change_image_count(struct logical_volume *lv,
 	if (old_count > new_count)
 		return _raid_remove_images(lv, new_count, pvs);
 
-	return _raid_add_images(lv, new_count, pvs);
+	return _raid_add_images(lv, new_count, pvs, "");
 }
 
 int lv_raid_split(struct logical_volume *lv, const char *split_name,
@@ -1702,7 +1723,7 @@ int lv_raid_replace(struct logical_volume *lv,
 	 */
 try_again:
 	if (!_alloc_image_components(lv, allocate_pvs, match_count,
-				     &new_meta_lvs, &new_data_lvs)) {
+				     &new_meta_lvs, &new_data_lvs, "")) {
 		if (!(lv->status & PARTIAL_LV)) {
 			log_error("LV %s in not partial.", display_lvname(lv));
 			return 0;

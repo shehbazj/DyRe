@@ -35,7 +35,7 @@ echo "Display Virtual Groups"
 
 vgdisplay
 
-sudo lvremove vol_vg root
+sudo lvremove raid4 vol_vg
 
 #echo "Create A logical Volume"
 
