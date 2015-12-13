@@ -1,12 +1,13 @@
-echo -e "\e[1;31m Cleanup Start \e[0m"
+echo -e "Cleanup Start"
 
-if [ "$#" -ne 2 ]; then 
-	echo "Usage sudo ./cleanupLvm.sh <numDrives> <deviceArray>"
-	exit
+if [ "$#" -ne 3 ]; then 
+	echo "Usage sudo ./cleanupLvm.sh <startDev> <numDevs> <deviceArray>"
+	exit 
 fi
 
-numDrives=$1
-deviceArray=$2
+startDev=$1
+numDevs=$2
+deviceArray=$3
 
 echo "Delete volume if it exsits"
 
@@ -22,4 +23,4 @@ echo "Delete Physical Volume if that exists"
 
 pvremove /dev/loop$deviceArray
 
-echo -e "\e[1;31m Cleanup End \e[0m"
+echo -e "Cleanup End"

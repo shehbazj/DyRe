@@ -573,6 +573,10 @@ static int _raid_add_images(struct logical_volume *lv,
 	uint32_t old_count = lv_raid_image_count(lv);
 	uint32_t count = new_count - old_count;
 	uint64_t status_mask = -1;
+
+	// lv refers to the older logical volume type.
+	// hence seg will be set to raid4, if old lv is of type raid4.
+
 	struct lv_segment *seg = first_seg(lv);
 	struct dm_list meta_lvs, data_lvs;
 	struct lv_list *lvl;
@@ -617,6 +621,23 @@ static int _raid_add_images(struct logical_volume *lv,
 		log_error("Unable to add RAID images to %s of segment type %s",
 			  lv->name, lvseg_name(seg));
 		return 0;
+	}
+
+	if(!strcmp(new_segtype, "raid2p") && !strcmp(lvseg_name(seg),"raid4"))	// upgrade from raid4 to raid2p
+	{
+		// allocate a new metadata volume, like in case of linear -> mirrored (raid1) conversion
+		/* A complete resync will be done, no need to mark each sub-lv */
+		status_mask = ~(LV_REBUILD);
+			
+		if (!(lvl = dm_pool_alloc(lv->vg->vgmem, sizeof(*lvl)))) {
+			log_error("Memory allocation failed");
+			return 0;
+		}
+
+		if (!_alloc_rmeta_for_lv(lv, &lvl->lv))
+			return_0;
+
+		dm_list_add(&meta_lvs, &lvl->list);
 	}
 
 	// add a new meta + data volume here.

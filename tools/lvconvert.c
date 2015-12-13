@@ -1763,7 +1763,7 @@ static int _lvconvert_raid(struct logical_volume *lv, struct lvconvert_params *l
 
 	/*Change number of RAID4 images for upgrade to raid2p */
 	if(segtype_is_raid4(first_seg(lv)->segtype) && segtype_is_raid2p(lp->segtype)) {
-		image_count = lv_raid_image_count(lv);
+		image_count = lv_raid_image_count(lv);	// raid4 it is data + parity image counts
 		image_count += 1;
 	}
 
@@ -1780,9 +1780,8 @@ static int _lvconvert_raid(struct logical_volume *lv, struct lvconvert_params *l
 	if (arg_count(cmd, mirrors_ARG))
 		return lv_raid_change_image_count(lv, image_count, lp->pvh);
 
-	if (arg_count(cmd, udgrade_ARG)) // allocate only image and meta for 
-					// data part of the disk. I think the 
-					// parity is being computed in the Kernel.
+	if (arg_count(cmd, udgrade_ARG)) // image_count has been incremented to 1.
+					// increase number of RAID images.
 		return lv_raid_udgrade_image_count(lv, image_count, lp->pvh,\
 				 arg_str_value(cmd, udgrade_ARG, NULL));
 
