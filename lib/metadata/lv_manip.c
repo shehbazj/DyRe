@@ -2775,6 +2775,9 @@ static int _find_some_parallel_space(struct alloc_handle *ah,
 		  (ix + preferred_count >= devices_needed) &&
 		  (ix + preferred_count < devices_needed + alloc_state->log_area_count_still_needed) && !log_iteration_count++));
 
+	// ix returned is 0 in case of raid2p. Need to understand why it is giving such results.
+	// does the allocation policy need to change, or are we short on space?
+
 	/* Non-zero ix means at least one USE_AREA was returned */
 	if (preferred_count < alloc_state->num_positional_areas && !(alloc_parms->flags & A_CLING_TO_ALLOCED) && !ix)
 		return 1;
@@ -3042,6 +3045,10 @@ static int _allocate(struct alloc_handle *ah,
 	if (ah->alloc == ALLOC_CLING)
 		ah->alloc = ALLOC_CLING_BY_TAGS;
 
+	// this loop ends up giving alloc_state.allocated = 0
+	// for RAID. we need to check what is going wrong here!
+	// also, alloc_state.areas_size is 4 for raidp2. need to
+	// check whats happening there. 
 	/* Attempt each defined allocation policy in turn */
 	for (alloc = ALLOC_CONTIGUOUS; alloc <= ah->alloc; alloc++) {
 		/* Skip cling_by_tags if no list defined */
@@ -3052,6 +3059,11 @@ static int _allocate(struct alloc_handle *ah,
 
 		if (!ah->approx_alloc && !_sufficient_pes_free(ah, pvms, alloc_state.allocated, ah->new_extents))
 			goto_out;
+
+		/*
+			_init_alloc_parms will set/reset alloc_parms 
+			for ex. ALLOC_CONTIGUOUS
+		*/
 
 		_init_alloc_parms(ah, &alloc_parms, alloc, prev_lvseg,
 				  can_split, alloc_state.allocated,
@@ -3154,6 +3166,13 @@ static struct alloc_handle *_alloc_init(struct cmd_context *cmd,
 	uint32_t s, area_count, alloc_count, parity_count, total_extents;
 	size_t size = 0;
 
+	/*We assume area_count is the total number of *new_areas* that need
+	to be allocated to a drive. For a raid2p type upgrade from raid4,
+	we need area_count to be 2, 1 area for data and the other for metadata
+	of the parity drive.
+	Hence, we are going to follow the "replacement drive" logic here
+	*/
+
 	/* FIXME Caller should ensure this */
 	if (mirrors && !stripes)
 		stripes = 1;
@@ -3191,6 +3210,10 @@ static struct alloc_handle *_alloc_init(struct cmd_context *cmd,
 		/* mirrors specify their exact log count */
 		alloc_count += metadata_area_count;
 
+	// alloc_count will be 2 here for a RAID drive that needs to be added
+	// to already existing RAID pool. 1 alloc for data image, other alloc for
+	// metadata image.
+
 	size += sizeof(ah->alloced_areas[0]) * alloc_count;
 
 	if (!(ah = dm_pool_zalloc(mem, size))) {
@@ -3225,12 +3248,15 @@ static struct alloc_handle *_alloc_init(struct cmd_context *cmd,
 	 * is calculated from.  So, we must pass in the total count to get
 	 * a correct area_multiple.
 	 */
+
+	// _calc_area_multiple will be 1 for a replacement drive in a RAID array.
+
 	ah->area_multiple = _calc_area_multiple(segtype, area_count + parity_count, stripes);
 	//FIXME: s/mirror_logs_separate/metadata_separate/ so it can be used by others?
 	ah->mirror_logs_separate = find_config_tree_bool(cmd, allocation_mirror_logs_require_separate_pvs_CFG, NULL);
 
 	if (mirrors || stripes)
-		total_extents = new_extents;
+		total_extents = new_extents; // is it only data extents or data + parity extents?
 	else
 		total_extents = 0;
 

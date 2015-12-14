@@ -471,7 +471,8 @@ static int _alloc_image_components(struct logical_volume *lv,
 		// for 24MB volume, no of extents = 6.
 		// lv->le_count / (seg->area_count - segtype->parity_devs)
 		// = 6 / (5 - 2)  = 2.
-		extents = lv->le_count / (seg->area_count - segtype->parity_devs);
+		// This may be wrong. No of extents required = lv->le_count.
+		extents = lv->le_count;
 	}
 	else if (segtype_is_raid10(segtype))
 		// lv->le_count describes number of extents in 1 volume. for a 24MB linear volume,
@@ -541,13 +542,13 @@ static int _alloc_rmeta_for_lv(struct logical_volume *data_lv,
 	char *p, base_name[NAME_LEN];
 
 	dm_list_init(&allocatable_pvs);
-/*
+
 	if (!seg_is_linear(seg)) {
 		log_error(INTERNAL_ERROR "Unable to allocate RAID metadata "
 			  "area for non-linear LV, %s", data_lv->name);
 		return 0;
 	}
-*/
+
 	(void) dm_strncpy(base_name, data_lv->name, sizeof(base_name));
 	if ((p = strstr(base_name, "_mimage_")))
 		*p = '\0';
@@ -631,23 +632,6 @@ static int _raid_add_images(struct logical_volume *lv,
 		log_error("Unable to add RAID images to %s of segment type %s",
 			  lv->name, lvseg_name(seg));
 		return 0;
-	}
-
-	if(!strcmp(new_segtype, "raid2p") && !strcmp(lvseg_name(seg),"raid4"))	// upgrade from raid4 to raid2p
-	{
-		// allocate a new metadata volume, like in case of linear -> mirrored (raid1) conversion
-		/* A complete resync will be done, no need to mark each sub-lv */
-		status_mask = ~(LV_REBUILD);
-			
-		if (!(lvl = dm_pool_alloc(lv->vg->vgmem, sizeof(*lvl)))) {
-			log_error("Memory allocation failed");
-			return 0;
-		}
-
-		if (!_alloc_rmeta_for_lv(lv, &lvl->lv))
-			return_0;
-
-		dm_list_add(&meta_lvs, &lvl->list);
 	}
 
 	// add a new meta + data volume here.
