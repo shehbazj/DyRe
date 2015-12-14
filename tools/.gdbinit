@@ -1,7 +1,14 @@
 #b main
 #b  _lvconvert_raid
-b _lvconvert_raid 
-#b _alloc_image_components
+#b _lvconvert_raid 
+b _alloc_rmeta_for_lv
+b _alloc_image_components
+
+
+# FOR RAID4 TO RAID2P 
+
 #r -x raid2p vol_vg14/raid4vol
-#r --type raid4 -m 1 vol_vg56/linearvol
+
+# FOR LINEAR TO MIRROR
+
 #r -m +1 vol_vg56/linearvol

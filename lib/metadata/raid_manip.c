@@ -466,17 +466,27 @@ static int _alloc_image_components(struct logical_volume *lv,
 	 * individual devies, we must specify how large the individual device
 	 * is along with the number we want ('count').
 	 */
-	if (segtype_is_raid10(segtype))
-		extents = lv->le_count / (seg->area_count / 2); /* we enforce 2 mirrors right now */
-	else if (segtype_is_raid2p(segtype)){
-		extents = 0;
-		/* TODO: RAID2P parity needs to be allocated extents here.
-		allocate_image_component(meta)
-		allocate_image_component(image)
-		add them to new_meta_lvs, and new_data_lvs respectively. 
-		*/  
+	if (segtype_is_raid2p(segtype)){ // TODO if control does not go there and goes to else, 	
+					 // they perform the same function. this if can be discarded.
+		// for 24MB volume, no of extents = 6.
+		// lv->le_count / (seg->area_count - segtype->parity_devs)
+		// = 6 / (5 - 2)  = 2.
+		extents = lv->le_count / (seg->area_count - segtype->parity_devs);
 	}
+	else if (segtype_is_raid10(segtype))
+		// lv->le_count describes number of extents in 1 volume. for a 24MB linear volume,
+		// number of extents was 6.
+		// area count is number of parallel areas in each stripe. 
+		// if segtype_is_raid4() - area_count = 4 (3 data + 1 parity)
+		// if segtype_is_linear() - area count = 1
+		extents = lv->le_count / (seg->area_count / 2); /* we enforce 2 mirrors right now */
 	else{
+		// in case the volume contains parity device, the extents get distributed among
+		// data and parity drives. hence for a 3 data + 1 parity drive, no. of extents 
+		// le_count / (area_count - parity_devs) = 6 / (4 - 1) = 2
+
+		// for raid1 20MB volume, lv->le_count = 5, seg->area_count = 1, seg->parity_devs = 0
+		// extents = 5.
 		extents = (segtype->parity_devs) ?
 			   (lv->le_count / (seg->area_count - segtype->parity_devs)) :
 			   lv->le_count;
@@ -531,13 +541,13 @@ static int _alloc_rmeta_for_lv(struct logical_volume *data_lv,
 	char *p, base_name[NAME_LEN];
 
 	dm_list_init(&allocatable_pvs);
-
+/*
 	if (!seg_is_linear(seg)) {
 		log_error(INTERNAL_ERROR "Unable to allocate RAID metadata "
 			  "area for non-linear LV, %s", data_lv->name);
 		return 0;
 	}
-
+*/
 	(void) dm_strncpy(base_name, data_lv->name, sizeof(base_name));
 	if ((p = strstr(base_name, "_mimage_")))
 		*p = '\0';
